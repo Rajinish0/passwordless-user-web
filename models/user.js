@@ -12,12 +12,12 @@ const UserSchema = new mongoose.Schema({
         minlength: 3 
     },
 
-    lastName : {
-        type: String,
-        required: [true, "Please provide lastName"],
-        maxlength: 50,
-        minlength: 3
-    },
+    // lastName : {
+    //     type: String,
+    //     required: [true, "Please provide lastName"],
+    //     maxlength: 50,
+    //     minlength: 3
+    // },
 
     email: {
         type: String, 
@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema({
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             'Please provide a valid email',
           ],
-        unique: true
+        unique: [true, "This email already exists"]
     },
 
     password : {
@@ -41,19 +41,19 @@ const UserSchema = new mongoose.Schema({
         min: 1960
     },
 
-    phoneNum : {
-        type: String,
-        required: false, 
-        match: [
-            /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/,
-            "Please provide a valid number"
-        ]
-    },
+    // phoneNum : {
+    //     type: String,
+    //     required: false, 
+    //     match: [
+    //         /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/,
+    //         "Please provide a valid number"
+    //     ]
+    // },
 
     imagePath : {
         type: String,
         required: false,
-        default: "uploads/default-image.png"
+        default: "uploads/default-image.jpg"
     }
 });
 

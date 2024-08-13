@@ -21,7 +21,8 @@ const auth = async (req, res, next) => {
     }
     catch (error){
         console.log(error);
-        throw new UnauthorizedError("Authentication failed");
+        next(error);
+        // throw new UnauthorizedError("Authentication failed");
     }
 }
 

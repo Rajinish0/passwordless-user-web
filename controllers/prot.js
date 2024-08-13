@@ -1,9 +1,12 @@
 const User = require('../models/user');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, UnauthorizedError, NotFoundError } = require('../errors/index');
-const { hashPass } = require('../utils');
+const { hashPass, processReqWithPhoto } = require('../utils');
+const fs = require('fs');
+const path = require('path');
 
 const updateUser = async (req, res, next) => {
+try{
     const id = req.params.id;
     if (!id)
         return next(new BadRequestError("Id required for this route"));
@@ -15,6 +18,10 @@ const updateUser = async (req, res, next) => {
     if (firstName) updateData.firstName = firstName;
     if (batch) updateData.batch = batch;
     if (password) updateData.password = await hashPass(password);
+    if (req.files){
+        const finalPath = await processReqWithPhoto(req, id);
+        updateData.imagePath = finalPath;
+    }        
 
     const userId = req.user.userId;
     const user_ = await User.findByIdAndUpdate(
@@ -31,6 +38,17 @@ const updateUser = async (req, res, next) => {
         user_
        });
 }
+catch(err){
+    next(err);
+}
+finally{
+    if (req.files && req.files.photo && 
+        req.files.photo.tempFilePath !=
+        path.join( path.dirname('..'), 'uploads', 'default-image.jpg')
+    )
+        fs.unlink(req.files.photo.tempFilePath, (err)=>{});
+    }
+}
 
 const deleteUser = async (req, res, next) => {
     const userId = req.user.userId;
@@ -45,6 +63,15 @@ const deleteUser = async (req, res, next) => {
 
     if (!user_)
         return next( new NotFoundError(`No user with id ${id}`) );
+
+    if (user_.imagePath != 
+        path.join(path.dirname('..'), 'uploads', 'default-image.jpg')
+        )
+        fs.unlink(user_.imagePath, (err)=>{
+            if (err)
+                console.log(`ERROR DELETING ${id}'s photo: ${err}`)
+            })
+
     res.status(StatusCodes.OK)
        .send();
 }

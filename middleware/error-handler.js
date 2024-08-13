@@ -10,9 +10,23 @@ const errorHandlerMW = (err, req, res, next) => {
     if (err.code === 11000)
         return (res.status(StatusCodes.BAD_REQUEST)
                    .json({
-                    msg: err.errorResponse.errmsg,
-                    details: err.erros
+                    msg: "Duplicate key error",
                    }))
+    if (err.name === 'ValidationError'){
+        // console.log(err.errors);
+        const acctualErrors = Object
+                                .keys(err.errors)
+                                .reduce( (acc, key) => {
+                                        acc[key]  = err.errors[key].message
+                                        return acc},  {} ) ;
+        return res.
+        status(StatusCodes.BAD_REQUEST)
+        .json({
+            msg: 'Validation failed',
+            details: acctualErrors
+        }
+        )
+    }
     res.status(StatusCodes.INTERNAL_SERVER_ERROR)
        .json({msg : "Unknown server error occured, Check the logs."});
 }

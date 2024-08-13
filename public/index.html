@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="post" action="/api/v1/auth/register"
+    enctype="multipart/form-data">
+        <label for="firstName">Name:</label>
+        <input type="text" name="firstName">
+        <label for="password">Password: </label>
+        <input type="password" name="password">
+        <label for="email">Email: </label>
+        <input type="email" name="email">
+        <label for="batch">Batch</label>
+        <input type="number" name="batch">
+        <label for="photo">Choose an image to upload</label>
+        <input type="file" id="photo" name="photo"
+        accept="image/png, image/gif, image/jpeg">
+        <hr>
+
+        <button type="submit">Submit</button>
+    </form>
+    
+</body>
+</html>
