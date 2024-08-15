@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="styles/nav.css">
+    <link rel="stylesheet" href="styles/register.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-center">
+            <h1><a href="index.html">Alumni</a></h1>
+        </div>
+        <div id="right" class="nav-right">
+            <!-- Navigation links will be dynamically inserted here -->
+        </div>
+    </nav>
+
+    <div class="register-container">
+        <div class="register-card">
+            <h2>Register</h2>
+            <form id="register-form" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" required minlength="3" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required minlength="8" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="batch">Batch:</label>
+                    <input type="number" id="batch" name="batch" required min="1960">
+                </div>
+                <div class="form-group">
+                    <label for="image">Profile Image:</label>
+                    <input type="file" id="photo" name="photo" accept="image/*">
+                </div>
+                <button type="submit" class="register-btn">Register</button>
+                <div id="error-message" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/authUI.js"></script>
+    <script src="scripts/register.js"></script>
+</body>
+</html>

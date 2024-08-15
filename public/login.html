@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles/nav.css">
+    <link rel="stylesheet" href="styles/login.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-center">
+            <h1><a href="index.html">Alumni</a></h1>
+        </div>
+        <div id="right" class="nav-right">
+            <!-- Navigation links will be dynamically inserted here -->
+        </div>
+    </nav>
+
+    <div class="login-container">
+        <div class="login-card">
+            <h2>Login</h2>
+            <form id="login-form" method="post">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+                <div id="error-message" class="error-message hidden-elem"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/authUI.js"></script>
+    <script src="scripts/login.js"></script>
+</body>
+</html>

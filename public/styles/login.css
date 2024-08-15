@@ -1,0 +1,93 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 60px); /* Adjust based on your navbar height */
+}
+
+.login-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-card h2 {
+    color: #4267B2;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4267B2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    background-color: #365899;
+}
+
+.error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.hidden-elem{
+    display: none;
+}
+
+/* Add this if you want to style the navbar in this file */
+/* .navbar {
+    background-color: #4267B2;
+    padding: 1rem 2rem;
+}
+
+.navbar h1 a {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-right a {
+    color: white;
+    text-decoration: none;
+    margin-left: 1rem;
+} */

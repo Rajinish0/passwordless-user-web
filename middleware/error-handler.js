@@ -14,6 +14,11 @@ const errorHandlerMW = (err, req, res, next) => {
                    }))
     if (err.name === 'ValidationError'){
         // console.log(err.errors);
+        /*
+        i want the errors to be available on the client side for validation
+        so for each field that was wrong the error will be availbe in the body as
+        req.body.details.firstName for example
+        */
         const acctualErrors = Object
                                 .keys(err.errors)
                                 .reduce( (acc, key) => {

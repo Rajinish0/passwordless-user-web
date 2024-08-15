@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 const { hashPass } = require('../utils');
+const { BadRequestError } = require('../errors');
 
 
 const UserSchema = new mongoose.Schema({
@@ -54,20 +55,28 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false,
         default: "uploads/default-image.jpg"
+    },
+
+    activated : {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 
 
-UserSchema.pre('save', async function () {
+UserSchema.pre('save', async function (next) {
+    // if (this.password.length < 8)
+        // next(new BadRequestError("password length too small"));
     this.password = await hashPass(this.password);
 })
 
-UserSchema.methods.createJWT = function () {
+UserSchema.methods.createJWT = function (time, secret) {
     return jwt.sign(
         {userId : this._id, userEmail : this.email },
-        process.env.JWT_SECRET,
+        secret || process.env.JWT_SECRET,
         {
-            expiresIn: process.env.JWT_LIFETIME
+            expiresIn: time || process.env.JWT_LIFETIME
         }
     );
 };

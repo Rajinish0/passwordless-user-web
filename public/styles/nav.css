@@ -1,0 +1,27 @@
+.navbar {
+    background-color: #4267B2;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-center h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.nav-right a {
+    background-color: #fff;
+    color: #4267B2;
+    padding: 1rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-right a:hover {
+    background-color: #e4e6eb;
+}

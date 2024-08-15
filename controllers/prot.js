@@ -17,6 +17,11 @@ try{
     updateData = {}
     if (firstName) updateData.firstName = firstName;
     if (batch) updateData.batch = batch;
+    //the problem with password is that im saving the hashed value, so i have two choices
+    //either i change the pre save function and check for password length there
+    //or check the length here, im doing that here for now since im using findByIdAndUpdate
+    //but might change that later.
+    if (password && password.length < 8) return next(new BadRequestError("min password length: 8"));
     if (password) updateData.password = await hashPass(password);
     if (req.files){
         const finalPath = await processReqWithPhoto(req, id);
@@ -24,6 +29,7 @@ try{
     }        
 
     const userId = req.user.userId;
+    // const user_ = await User.findById();
     const user_ = await User.findByIdAndUpdate(
         {_id : id },
         updateData,

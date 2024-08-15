@@ -2,6 +2,7 @@ const path = require('path');
 const sharp = require('sharp');
 const fs = require('fs').promises;
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 const { BadRequestError } = require('./errors');
 
 const hashPass = async function(password){
@@ -36,6 +37,25 @@ const processReqWithPhoto = async function(req, id){
             .resize(400, 400)
             .toFile(finalPath);
     return finalPath;
+}
+
+
+const transporter = nodemailer.createTransport(
+    {
+        service: "Gmail",
+        secure: true,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.APP_PASSWORD
+        }
+    }
+)
+
+const getMailConfig = () => {
+    return {
+        from: process.env.EMAIL,
+        subject: "Email Verification"
+    }
 }
 /*
 const storage = multer.diskStorage({
@@ -77,5 +97,7 @@ const upload = multer( {
 module.exports = {
     hashPass,
     validateImage,
-    processReqWithPhoto
+    processReqWithPhoto,
+    transporter,
+    getMailConfig
 }
