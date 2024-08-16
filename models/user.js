@@ -30,12 +30,6 @@ const UserSchema = new mongoose.Schema({
         unique: [true, "This email already exists"]
     },
 
-    password : {
-        type: String,
-        required: [true, "Please provide password"],
-        minlength: 8
-    },
-
     batch : {
         type: Number,
         required: [true, "Please provide batch number"],
@@ -61,15 +55,24 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         required: false,
         default: false
+    },
+
+    lastVerifyRequest : {
+        type: Date,
+        default: Date.now
+    },
+
+    phoneNum : {
+        type : String, 
+        default : "",
+        required: false,
+        match : [/^(?:\+92|92)?\s?(\d{3})[\s.-]?(\d{7})$|^(?:\+92|92)?\s?\((\d{3})\)[\s.-]?(\d{7})$/, 
+                "Please provide a valid phone number"]
     }
+}, {
+    timestamps: true
 });
 
-
-UserSchema.pre('save', async function (next) {
-    // if (this.password.length < 8)
-        // next(new BadRequestError("password length too small"));
-    this.password = await hashPass(this.password);
-})
 
 UserSchema.methods.createJWT = function (time, secret) {
     return jwt.sign(
@@ -86,4 +89,4 @@ UserSchema.methods.comparePassword = async function (canditatePassword) {
     return isMatch
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User-db-2', UserSchema);

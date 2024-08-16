@@ -6,6 +6,7 @@ async function loadUsers(page = 1) {
     try {
         const response = await fetch(USERS_ENDPOINT+`?page=${page}&limit=${limit}`);
         const data = await response.json();
+        console.log(data);
         
         const userList = document.getElementById('user-list');
         userList.innerHTML = ''; // Clear previous users
@@ -63,13 +64,6 @@ document.getElementById('next-btn').addEventListener('click', () => {
     loadUsers(currentPage);
 });
 
-
-siteButton.addEventListener('click', 
-    ()=>{
-        currentPage = 1;
-        loadUsers(currentPage);
-    }
-)
 
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -14,8 +14,16 @@ try{
         make the api return various strings, the plan is to have some limitation on the number of these
         req verif requests, when that limit is reached a calmdown should be imposed on this id for a few hours.
     */
-    if (!resp.ok)
-        throw Error("");
+    if (!resp.ok){
+        const re = await resp.json();
+
+        if (re.msg == 'Requested verify link less than 30 mins ago'){
+            elem.innerHTML = "You requested a verify link less than 30 mins ago, please wait."
+            return;
+            }
+        else 
+            throw Error("");
+    }
 
     window.location.href = "verif-conf.html";
 }

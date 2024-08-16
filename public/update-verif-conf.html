@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Info</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Login</title>
     <link rel="stylesheet" href="styles/nav.css">
-    <link rel="stylesheet" href="styles/info.css">
+    <link rel="stylesheet" href="styles/login.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-center">
-            <a href="index.html"><button id="site-name"><h1>Alumni</h1></button></a>
+            <h1><a href="index.html">Alumni</a></h1>
         </div>
         <div id="right" class="nav-right">
             <div id="right" class="nav-right">
@@ -20,11 +19,11 @@
             </div>
         </div>
     </nav>
-    <section class="user-info-container">
-        <div id="user-info">
-            <!-- User data will be dynamically inserted here -->
-        </div>
-    </section>
-    <script src="scripts/info.js"></script>
+
+    <p>A link was sent to your email address. Please follow the link to update your info.
+    </p>
+    <div id="timeout"></div>
+
+    <script src="scripts/verif-conf.js"></script>
 </body>
 </html>

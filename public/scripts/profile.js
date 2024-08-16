@@ -1,10 +1,19 @@
+const errDiv = document.getElementById("error-message");
+const confDialog = document.getElementById("confirm-dialog");
+const confYes = document.getElementById("confirm-yes");
+const confNo = document.getElementById("confirm-no");
+
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const navRight = document.querySelector('.nav-right');
-    const userId = localStorage.getItem('userId');
+    const userId = getQueryParam('id');
     
     if (!userId) {
         // alert("You are not authorized, please log in again")
-        window.location.href = 'login.html'; // Redirect to login if no userId in localStorage
+        window.location.href = 'update.html'; // Redirect to login if no userId in localStorage
         return;
     }
     
@@ -18,31 +27,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Display user profile form
         const profileContainer = document.getElementById('profile-container');
         profileContainer.innerHTML = `
-            <form id="profile-form" enctype="multipart/form-data">
-                <div class="profile-card">
-                    <img src="${user.imagePath}" alt="${user.firstName}">
+        <form id="profile-form" enctype="multipart/form-data">
+            <div class="profile-card">
+                <img src="${user.imagePath}" alt="${user.firstName}">
+    
+                <div class="form-group">
                     <h2>${user.firstName}</h2>
-                    
+                </div>
+    
+                <div class="form-group">
                     <label for="firstName">First Name:</label>
                     <input type="text" id="firstName" name="firstName" value="${user.firstName}" minlength=3>
-                    
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" placeholder="Enter new password" minlength=8>
-                    
+                </div>
+                
+                <div class="form-group">
                     <label for="batch">Batch:</label>
-                    <input type="number" id="batch" name="batch" value="${user.batch}" min=1940>
-                    
+                    <input type="number" id="batch" name="batch" value="${user.batch}" min=1960>
+                </div>
+                
+                <div class="form-group">
                     <label for="photo">Update profile Image:</label>
                     <input type="file" id="photo" name="photo" accept="image/*">
-
-                    <button type="submit">Update Profile</button>
                 </div>
-            </form>
-            <div id="error-message"></div>
-        `;
+
+                <div id="opts">
+                    <button type="submit" id="submit-btn" class="submit-btn">Update Profile</button>
+                    <button type="submit" id="delete-btn" class="delete-btn">Delete Profile</button>
+                </div>
+
+                <div id="f-error-message" class="error-message"></div>
+            </div>
+        </form>
+    `;
+    
         
         const profileForm = document.getElementById('profile-form');
-        profileForm.addEventListener('submit', async (event) => {
+        const submitButton = document.getElementById('submit-btn');
+        const deleteButton = document.getElementById('delete-btn');
+        const ferrDiv = document.getElementById("f-error-message");
+        console.log(submitButton);
+        submitButton.addEventListener('click', async (event) => {
             event.preventDefault();
 
             const formData = new FormData(profileForm);
@@ -57,8 +81,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // const changes = {};
             if (formData.get('firstName').trim() === user.firstName) 
                 formData.delete('firstName');
-            if (!formData.get('password').trim())
-                formData.delete('password');
+            // if (!formData.get('password').trim())
+                // formData.delete('password');
             if (formData.get('batch').trim() === user.batch) 
                 formData.delete('batch');
             
@@ -71,31 +95,80 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method: 'PUT',
                     body: formData,
                 });
+
+                console.log('here!!');
                 
                 if (!updateResponse.ok) {
                     const errorData = await updateResponse.json();
                     if (updateResponse.status === 401) {
                         alert("You are unauthorized, please log in again");
-                        window.location.href = 'login.html'; // Redirect if unauthorized
+                        window.location.href = 'update.html'; // Redirect if unauthorized
                     } else if (errorData.details && errorData.details.password) {
-                        document.getElementById('error-message').textContent = errorData.details.password;
+                        console.log("HERE");
+                        ferrDiv.textContent = errorData.details.password;
+                        ferrDiv.style.display = 'flex';
                     } else {
-                        document.getElementById('error-message').textContent = 'Failed to update profile. Please try again later.';
+                        console.log("HERE NOW");
+                        ferrDiv.textContent = 'Failed to update profile. Please try again later.';
+                        ferrDiv.style.display = 'flex';
                     }
                     return;
                 }
                 
                 // Successfully updated
                 alert('Profile updated successfully');
-                window.location.reload(); // Reload the page to reflect changes
+                window.location.href = 'index.html'; // Reload the page to reflect changes
             } catch (error) {
                 console.error('Error updating profile:', error);
-                document.getElementById('error-message').textContent = 'Failed to update profile. Please try again later.';
+                ferrDiv.textContent = 'Failed to update profile. Please try again later.';
+                ferrDiv.style.display = 'flex';
             }
         });
+
+        confYes.addEventListener('click', async () => {
+            confDialog.style.display = 'none';
+            try{
+                const deleteResponse = await fetch(`/api/v1/user/${userId}`, {
+                    method: 'DELETE',
+                });
+
+                if (!deleteResponse.ok){
+                    if (deleteResponse.status === 401) {
+                        alert("You are unauthorized, please log in again");
+                        window.location.href = 'update.html'; // Redirect if unauthorized
+                    } 
+                    else {
+                        console.log("HERE NOW");
+                        ferrDiv.textContent = 'Failed to delete profile. Please try again later.';
+                        ferrDiv.style.display = 'flex';
+                    }
+                }
+                else{
+                    alert("profile deleted");
+                    window.location.href = "index.html";
+                }
+            }
+            catch (err){
+                console.log('here')
+                console.log(err);
+                ferrDiv.textContent = 'Failed to delete profile. Please try again later.';
+                ferrDiv.style.display = 'flex';
+            }
+        })
+
+        confNo.addEventListener('click', () => {
+            confDialog.style.display = 'none';
+        })
+
+        deleteButton.addEventListener('click', (e)=> {
+            e.preventDefault();
+            confDialog.style.display = 'flex'
+        })
+
         
     } catch (error) {
-        console.error('Error fetching user profile:', error);
-        document.getElementById('profile-container').innerHTML = `<p>Failed to load profile. Please try again later.</p>`;
+        // console.error('Error fetching user profile:', error);
+        errDiv.textContent = `Failed to load profile. Please try again later`;
+        errDiv.style.display = 'block';
     }
 });

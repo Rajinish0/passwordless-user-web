@@ -25,8 +25,9 @@ const appRouter  = require('./routes/app-routes');
 app.use(cookieParser());
 app.use(express.static('./public'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 app.use(express.json());
+app.set('view engine', 'ejs');
+
 //this puts files in req obj
 app.use( fileUpload( 
     {useTempFiles: true,
@@ -58,7 +59,7 @@ app.get('/api/check-auth', (req, res) => {
 
 app.use(API+API_V+AUTH_ENDPOINT, authRouter);
 app.use(API+API_V+PROT_ENDPOINT, authMW, protRouter);
-app.use(API+API_V+USERS_ENDPOINT, appRouter);
+app.use(API+API_V, appRouter);
 app.use(API+API_V+USERS_ENDPOINT, userRouter);
 
 

@@ -1,12 +1,17 @@
+const errElem = document.getElementById('error-message');
+
+function showMessage(msg){
+    errElem.innerText = msg;
+    errElem.classList.remove('hidden-elem');
+}
+
 document.getElementById('login-form').addEventListener('submit', async function (e) {
     e.preventDefault();
 
     const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
 
     const loginData = {
-        email,
-        password
+        email
     };
 
     try {
@@ -19,30 +24,45 @@ document.getElementById('login-form').addEventListener('submit', async function 
         });
 
         console.log('here now');
-        const data = await response.json();
         if (!response.ok) {
+            const data = await response.json();
             console.log(data, data.msg);
             if (data.msg === 'Not Verified'){
                 console.log("redirecting to req ver");
                 window.location.href = `req-verif.html?id=${data.id}`;
                 return;
             }
+
+            if (data.msg === 'Updated less than 30 mins ago'){
+                showMessage("Your profile was updated less than 30 mins ago, please wait.");
+                // const errElem = document.getElementById('error-message');
+                // errElem.textContent = "Your profile was updated less than 30 mins ago, please wait.";
+                // errElem.classList.remove('hidden-elem');
+                return;
+            }
+
+            if (data.msg === 'Invalid email'){
+                showMessage("Invalid email");
+                return;
+            }
             throw new Error('Login failed');
         }
 
-        localStorage.setItem('userId', data.userId);
-        localStorage.setItem('expiresAt', data.expiresAt);
-        console.log(localStorage);
+        // localStorage.setItem('userId', data.userId);
+        // localStorage.setItem('expiresAt', data.expiresAt);
+        // console.log(localStorage);
         // Redirect to the user's profile or another page
 
-        console.log('redirecting');
-        window.location.href = 'index.html';
+        // console.log('redirecting');
+        // window.location.href = 'index.html';
+        window.location.href = "update-verif-conf.html";
 
     } catch (error) {
         console.log(error);
         console.log('doing it');
-        const errElem = document.getElementById('error-message');
-        errElem.textContent = 'Invalid email or password';
-        errElem.classList.remove('hidden-elem');
+        showMessage("Server error, please try again later");
+        // const errElem = document.getElementById('error-message');
+        // errElem.textContent = 'Invalid email or password';
+        // errElem.classList.remove('hidden-elem');
     }
 });

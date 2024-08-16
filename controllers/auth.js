@@ -1,10 +1,12 @@
 const User = require('../models/user');
 const { StatusCodes } = require('http-status-codes');
-const { BadRequestError, UnauthorizedError } = require('../errors/index');
+const { BadRequestError, UnauthorizedError, BadRequestWithInfoError } = require('../errors/index');
 const { processReqWithPhoto, getMailConfig, transporter } = require('../utils');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+
+const THIRTY_MINS_IN_MS = 30 * 60 * 1000;
 
 /* 
 The reason for using different JWT secrets here is that im exposing the token in the verify link, and I don't 
@@ -17,6 +19,16 @@ const constructMail = (email, token) => {
     cfg.text = `Hello, you recently registered at our webiste. 
                 Please follow the link below to verify your email:
                 http://localhost:80/api/v1/auth/verify/${token}
+                `
+    return cfg
+}
+
+const constructMailForUpdate = (email, token) => {
+    let cfg = getMailConfig();
+    cfg.to = email;
+    cfg.text = `Hello, you recently requested for data update at our webiste. 
+                Please follow the link below to update your data:
+                http://localhost:80/api/v1/auth/update/${token}
                 `
     return cfg
 }
@@ -65,18 +77,17 @@ const register = async (req, res, next) => {
 }
 
 const login = async (req, res, next) => {
-    const { email, password } = req.body;
+try{
+    const { email } = req.body;
 
-    if (!email || !password)
-        return next(new BadRequestError("Please provide email and password"));
+    console.log('got the req');
+
+    if (!email)
+        return next(new BadRequestError("Please provide email"));
 
     const user = await User.findOne( {email} )
     if (!user)
         return next(new UnauthorizedError("Invalid email"));
-    const checkPass = await user.comparePassword(password);
-
-    if (!checkPass)
-        return next(new UnauthorizedError("Invalid password"));
 
     if (!user.activated){
         return res.status(StatusCodes.UNAUTHORIZED)
@@ -85,27 +96,29 @@ const login = async (req, res, next) => {
             id: user._id
            });
     }
-        // return next(new UnauthorizedError("Not verified"));
 
-    const token = user.createJWT();
-    const expirationDate = new Date(Date.now() + 3600 * 1000);
+    if (Date.now() - user.updatedAt < THIRTY_MINS_IN_MS)
+        return next(new BadRequestError("Updated less than 30 mins ago"));
+
+    const token = user.createJWT("30m");
+    // const expirationDate = new Date(Date.now() + 3600 * 1000);
+    mailCfg = constructMailForUpdate(user.email, token);
+    await transporter.sendMail(mailCfg);
 
     // Set cookies with the calculated expiration date
     /* 
     I think I might change some pages to being SSR later, so Im going to store the userId 
     in the cookies even though i don't need them for now.
     */
-    res.cookie('token', token, { expires: expirationDate, httpOnly: true, secure: false });
-    res.cookie('userId', user._id, { expires: expirationDate, httpOnly: true, secure: false });
+    // res.cookie('token', token, { expires: expirationDate, httpOnly: true, secure: false });
+    // res.cookie('userId', user._id, { expires: expirationDate, httpOnly: true, secure: false });
 
-    res.status(
-        StatusCodes.OK
-    ).json(
-        {userId : user._id,
-         token,
-         expiresAt: expirationDate
-        }
-    )
+    return res.status(StatusCodes.OK)
+              .send();
+}
+catch (err){
+    next(err);
+}
 }
 
 
@@ -115,10 +128,13 @@ const verify = async (req, res, next) => {
         return next(new BadRequestError("token must be specified for this end point"));
 
     try{
+        console.log(token);
         const payload = jwt.verify(
             token, process.env.JWT_REG_SECRET
         )
         const id = payload.userId;
+
+        console.log('HERE NOW');
         const user_ = await User.findByIdAndUpdate(
             {_id: id},
             {activated: true}
@@ -127,7 +143,9 @@ const verify = async (req, res, next) => {
         if (!user_)
             return next(new BadRequestError("token was jeopradized, please try again."));
 
-        res.send("You are verified, please log in to continue");
+        // res.send('you are verified');
+        res.status(StatusCodes.OK)
+           .redirect("/verified.html");
         
     }
     catch (err){
@@ -146,6 +164,14 @@ const reqVerify = async (req, res, next) => {
         if (!user_)
             return next(new BadRequestError("No user found with this id"));
 
+        if (user_.activated)
+            return next(new BadRequestError("User already verified"));
+
+        if (Date.now() - user_.lastVerifyRequest < THIRTY_MINS_IN_MS)
+            return next(new BadRequestError("Requested verify link less than 30 mins ago"));
+
+        user_.lastVerifyRequest = Date.now();
+        await user_.save();
         const token = user_.createJWT("8m", process.env.JWT_REG_SECRET);
         const mailCfg = constructMail(user_.email, token);
 
@@ -163,9 +189,39 @@ const reqVerify = async (req, res, next) => {
     }
 }
 
+const update = async (req, res, next) => {
+    const token = req.params.token;
+    if (!token)
+        return next(new UnauthorizedError("No token provided"));
+
+    try{
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        const user_ = await User.findById({_id : payload.userId});
+        if (!user_)
+            return next(new BadRequestWithInfoError("User corresponding to token not found"));
+            // return next(new BadRequestError("User corresponding to token not found"));
+
+        if (Date.now() - user_.updatedAt < THIRTY_MINS_IN_MS)
+            return next(new BadRequestWithInfoError("Profile was updated less than 30 mins ago"));
+            // return next(new BadRequestError("Updated less than 30 mins ago"));
+
+        const id = payload.userId;
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 3600 * 1000
+        })
+        res.redirect(`/profile.html?id=${id}`);
+    }
+    catch (err){
+        next(err);
+    }
+}
+
 module.exports = {
     register,
     login,
     verify,
-    reqVerify
+    reqVerify,
+    update
 }

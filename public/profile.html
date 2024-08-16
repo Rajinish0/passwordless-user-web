@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
+    <link rel="stylesheet" href="styles/nav.css">
     <link rel="stylesheet" href="styles/profile.css">
 </head>
 <body>
@@ -13,18 +14,33 @@
                 <a href="index.html"><button id="site-name"><h1>Alumni</h1></button></a>
             </div>
             <div id="right" class="nav-right">
-                <!-- Navigation items will be injected by JavaScript -->
+                <div id="right" class="nav-right">
+                    <a href="register.html">Register</a>
+                    <a href="update.html">Update Info</a>
+                </div>
             </div>
         </nav>
     </header>
     
     <main>
-        <h1>User Profile</h1>
         <div id="profile-container">
             <!-- User profile information will be injected here -->
         </div>
+
+        <div id="confirm-dialog" class="dialog-overlay">
+            <div class="dialog-box">
+                <h3>Are you sure?</h3>
+                <div class="dialog-options">
+                    <button id="confirm-yes" class="dialog-btn confirm-yes">Yes</button>
+                    <button id="confirm-no" class="dialog-btn confirm-no">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-message" class="error-message"></div>
+
     </main>
-    <script src="scripts/authUI.js"></script>
+
     <script src="scripts/profile.js" defer></script>
 </body>
 </html>

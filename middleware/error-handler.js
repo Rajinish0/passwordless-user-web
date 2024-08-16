@@ -1,9 +1,15 @@
 const { StatusCodes } = require('http-status-codes');
 const GenericAPIError = require('../errors/GenericAPIError');
+const BadReqestWithInfoError = require('../errors/BadRequestWithInfoError');
 
 const errorHandlerMW = (err, req, res, next) => {
     console.log(err);
     console.log("Caught the error");
+    if (err instanceof BadReqestWithInfoError){
+        console.log(err.msg);
+        return res.status(err.statusCode)
+                  .render('info', {info: err.message});
+    }
     if (err instanceof GenericAPIError)
         return (res.status(err.statusCode)
                    .json({msg : err.message}));
@@ -32,6 +38,15 @@ const errorHandlerMW = (err, req, res, next) => {
         }
         )
     }
+
+    if (err.name === 'TokenExpiredError'){
+        return res.status(StatusCodes.UNAUTHORIZED)
+                  .render('info', {info: "Your token is expired"} );
+                //   .redirect('/expired.html');
+        // return res.status(StatusCodes.UNAUTHORIZED)
+                //   .json({msg: "Token expired"});
+    }
+
     res.status(StatusCodes.INTERNAL_SERVER_ERROR)
        .json({msg : "Unknown server error occured, Check the logs."});
 }

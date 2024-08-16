@@ -34,6 +34,14 @@ const getUser = async (req, res, next) => {
 try{
     const id = req.params.id;
     console.log(id);
+    // if (req.cookies.token != null){
+    //     try{
+    //         const payload = jwt.verify(token, process.env.JWT_SECRET);
+    //     }
+    //     catch(err){
+
+    //     }
+    // }
     const user_ = await user.findOne({
         _id: id
     }).select("-password")
