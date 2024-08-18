@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, UnauthorizedError, BadRequestWithInfoError } = require('../errors/index');
-const { processReqWithPhoto, getMailConfig, transporter } = require('../utils');
+const { processReqWithPhoto, getMailConfig, transporter, minsInMs } = require('../utils');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -118,8 +118,12 @@ try{
     console.log(Date.now()- user.updatedAt);
     console.log(email, process.env.SUPER_USR_EMAIL)
     console.log(Date.now(), user.lastVerifyRequest, user.createdAt);
-    if (Date.now() - user.lastVerifyRequest < THIRTY_MINS_IN_MS) //&&
-        //(user.lastVerifyRequest - user.createdAt > 1000))
+    /* 
+    I'm still debating if it is a good idea to let the user update their profile
+    immediatly after they registered or not, but i have allowed this for now.
+    */
+    if (Date.now() - user.lastVerifyRequest < minsInMs(30) &&
+        (user.lastVerifyRequest - user.createdAt > 1000))
         return next(new BadRequestError("Updated less than 30 mins ago"));
 
     user.lastVerifyRequest = Date.now();
@@ -197,7 +201,7 @@ const reqVerify = async (req, res, next) => {
         if (user_.activated)
             return next(new BadRequestError("User already verified"));
 
-        if (Date.now() - user_.lastVerifyRequest < THIRTY_MINS_IN_MS)
+        if (Date.now() - user_.lastVerifyRequest < minsInMs(30))
             return next(new BadRequestError("Requested verify link less than 30 mins ago"));
 
         user_.lastVerifyRequest = Date.now();

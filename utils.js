@@ -93,11 +93,16 @@ const upload = multer( {
     fileFilter } );
 */
 
+const minsInMs = (minutes) => {
+    return minutes * 60 * 1000;
+}
+
 
 module.exports = {
     hashPass,
     validateImage,
     processReqWithPhoto,
     transporter,
-    getMailConfig
+    getMailConfig,
+    minsInMs
 }
