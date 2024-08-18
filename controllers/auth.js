@@ -34,6 +34,7 @@ const constructMail = (email, token) => {
 
 const constructMailForUpdate = (email, token) => {
     let cfg = getMailConfig();
+    cfg.subject = "Profile update"
     cfg.to = email;
     cfg.html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
