@@ -65,7 +65,8 @@ document.getElementById('next-btn').addEventListener('click', () => {
     loadUsers(currentPage);
 });
 
-document.getElementById('search-btn').addEventListener('click', () => {
+document.getElementById('search-form').addEventListener('submit', (e) => {
+    e.preventDefault();
     currentPage = 1;
     loadUsers(currentPage, getSearchQuery());
 });

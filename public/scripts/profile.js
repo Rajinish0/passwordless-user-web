@@ -8,6 +8,28 @@ function getQueryParam(param) {
     return urlParams.get(param);
 }
 
+function showNotification(message, postAction) {
+    const modal = document.getElementById('notification-modal');
+    const messageEl = document.getElementById('notification-message');
+    const closeBtn = document.getElementById('close-notification');
+    
+    messageEl.textContent = message;
+    modal.style.display = 'flex';
+
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+        postAction();
+    }
+
+    // Close the modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+            postAction();
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     function clearErrors() {
@@ -29,7 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userId = getQueryParam('id');
     
     if (!userId) {
-        // alert("You are not authorized, please log in again")
         window.location.href = 'update.html'; // Redirect to login if no userId in localStorage
         return;
     }
@@ -141,8 +162,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!updateResponse.ok) {
                     const data = await updateResponse.json();
                     if (updateResponse.status === 401) {
-                        alert("You are unauthorized, please log in again");
-                        window.location.href = 'update.html'; // Redirect if unauthorized
+                        showNotification("You are unauthorized, please log in again", ()=>{
+                            window.location.href = 'update.html';
+                        });
                     } else if (data.msg === 'Validation failed' && data.details) {
                         displayFieldErrors(data.details);
                     } else if (data.msg === 'File mimetype must be image' || 
@@ -162,8 +184,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 
                 // Successfully updated
-                alert('Profile updated successfully');
-                window.location.href = 'index.html'; // Reload the page to reflect changes
+                showNotification('Profile updated successfully', () => {
+                    window.location.href = 'index.html';
+                });
             } catch (error) {
                 console.error('Error updating profile:', error);
                 ferrDiv.textContent = 'Failed to update profile. Please try again later.';
@@ -180,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (!deleteResponse.ok){
                     if (deleteResponse.status === 401) {
-                        alert("You are unauthorized, please log in again");
+                        showNotification("You are unauthorized, please log in again");
                         window.location.href = 'update.html'; // Redirect if unauthorized
                     } 
                     else {
@@ -190,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
                 else{
-                    alert("profile deleted");
+                    showNotification("profile deleted");
                     window.location.href = "index.html";
                 }
             }

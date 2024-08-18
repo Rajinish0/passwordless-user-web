@@ -22,10 +22,10 @@ const constructMail = (email, token) => {
             <p>Hello,</p>
             <p>Thank you for registering at our website. To complete your registration, please verify your email by clicking the button below:</p>
             <p style="text-align: center;">
-                <a href="http://localhost:80/api/v1/auth/verify/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+                <a href="http://${process.env.DOMAIN_NAME || 'localhost'}:80/api/v1/auth/verify/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
             </p>
             <p>If the button above doesn't work, you can also click the link below or copy and paste it into your browser:</p>
-            <p><a href="http://localhost:80/api/v1/auth/verify/${token}">http://localhost:80/api/v1/auth/verify/${token}</a></p>
+            <p><a href="http://${process.env.DOMAIN_NAME || 'localhost'}:80/api/v1/auth/verify/${token}">http://${process.env.DOMAIN_NAME || 'localhost'}:80/api/v1/auth/verify/${token}</a></p>
         </div>
     `;
     return cfg;
@@ -41,10 +41,10 @@ const constructMailForUpdate = (email, token) => {
             <p>Hello,</p>
             <p>You recently requested to update your data on our website. To proceed with the update, please click the button below:</p>
             <p style="text-align: center;">
-                <a href="http://localhost:80/api/v1/auth/update/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Update Data</a>
+                <a href="http://${process.env.DOMAIN_NAME || 'localhost'}:80/api/v1/auth/update/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Update Data</a>
             </p>
             <p>If the button above doesn't work, you can also click the link below or copy and paste it into your browser:</p>
-            <p><a href="http://localhost:80/api/v1/auth/update/${token}">http://localhost:80/api/v1/auth/update/${token}</a></p>
+            <p><a href="http://${process.env.DOMAIN_NAME || 'localhost'}:80/api/v1/auth/update/${token}">http://${process.env.DOMAIN_NAME || 'localhost'}:80/api/v1/auth/update/${token}</a></p>
         </div>
     `;
     return cfg;
@@ -57,7 +57,7 @@ const register = async (req, res, next) => {
         console.log(req.files);
         const user = new User({ ...req.body });
         user.activated = false;
-        const token = user.createJWT("8m", process.env.JWT_REG_SECRET);
+        const token = user.createJWT("30m", process.env.JWT_REG_SECRET);
         if (req.files && req.files.photo){
             const finalPath = await processReqWithPhoto(req, user._id);
             user.imagePath = finalPath;
@@ -117,7 +117,9 @@ try{
 
     console.log(Date.now()- user.updatedAt);
     console.log(email, process.env.SUPER_USR_EMAIL)
-    if (Date.now() - user.lastVerifyRequest < THIRTY_MINS_IN_MS)
+    console.log(Date.now(), user.lastVerifyRequest, user.createdAt);
+    if (Date.now() - user.lastVerifyRequest < THIRTY_MINS_IN_MS) //&&
+        //(user.lastVerifyRequest - user.createdAt > 1000))
         return next(new BadRequestError("Updated less than 30 mins ago"));
 
     user.lastVerifyRequest = Date.now();

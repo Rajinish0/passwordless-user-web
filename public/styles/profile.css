@@ -165,3 +165,82 @@ body {
 .form-group {
     margin-bottom: 1.5rem;
 }
+
+
+/* Notification Modal Styles */
+#notification-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1001; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black with transparency */
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px); /* Adds a blur effect behind the modal */
+}
+
+#notification-modal .modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem 1.5rem; /* Increased top/bottom padding */
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out; /* Fade-in effect */
+}
+
+#notification-modal .modal-content p {
+    font-size: 1rem;
+    color: #333;
+    margin: 0 0 1rem 0; /* Added bottom margin */
+    line-height: 1.5; /* Improved readability */
+}
+
+#close-notification {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s;
+    padding: 5px; /* Increased touch target size */
+}
+
+#close-notification:hover {
+    color: #4267B2; /* Matches the primary button color */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 480px) {
+    #notification-modal .modal-content {
+        width: 95%;
+        padding: 1.5rem 1rem;
+    }
+
+    #notification-modal .modal-content p {
+        font-size: 0.9rem;
+    }
+
+    #close-notification {
+        font-size: 1.3rem;
+    }
+}

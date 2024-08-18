@@ -13,6 +13,10 @@ try{
 
     let query = {};
 
+    const SUPER_USR_ID = process.env.SUPER_USR_ID;
+    if (SUPER_USR_ID)
+        query._id = { $ne : SUPER_USR_ID };
+
     if (req.query.firstname)
         query.firstName = { $regex: req.query.firstname, $options: 'i' };
         // query.firstName = req.query.firstname.trim();

@@ -1,13 +1,24 @@
 const errElem = document.getElementById('error-message');
+const submitButton = document.querySelector('.login-btn');
 
 function showMessage(msg){
     errElem.innerText = msg;
     errElem.classList.remove('hidden-elem');
 }
 
+let origText;
+
+document.addEventListener('DOMContentLoaded', 
+    () => {
+        origText = submitButton.innerText;
+    }
+)
+
 
 document.getElementById('login-form').addEventListener('submit', async function (e) {
     e.preventDefault();
+    submitButton.disabled = true;
+    submitButton.innerText = 'Processing...';
 
     const email = document.getElementById('email').value;
 
@@ -65,5 +76,10 @@ document.getElementById('login-form').addEventListener('submit', async function 
         // const errElem = document.getElementById('error-message');
         // errElem.textContent = 'Invalid email or password';
         // errElem.classList.remove('hidden-elem');
+    }
+
+    finally{
+        submitButton.disabled = false;
+        submitButton.innerText = origText;
     }
 });

@@ -64,9 +64,9 @@ const UserSchema = new mongoose.Schema({
 
     facebook: {
         type: String,
-        match: [/^(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?$/,
-                "Please provide a valid facebook url"
-        ],
+        // match: [/^(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?$/,
+        //         "Please provide a valid facebook url"
+        // ],
         required: false,
         default: "",
         maxlength: 100
