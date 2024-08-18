@@ -2,9 +2,10 @@ let currentPage = 1;
 const limit = 12; // Increased to show more cards per page
 const USERS_ENDPOINT = '/api/v1/user'
 
-async function loadUsers(page = 1) {
+async function loadUsers(page = 1, queryParams = '') {
     try {
-        const response = await fetch(USERS_ENDPOINT+`?page=${page}&limit=${limit}`);
+        console.log(queryParams);
+        const response = await fetch(USERS_ENDPOINT+`?page=${page}&limit=${limit}&${queryParams}`);
         const data = await response.json();
         console.log(data);
         
@@ -64,6 +65,24 @@ document.getElementById('next-btn').addEventListener('click', () => {
     loadUsers(currentPage);
 });
 
+document.getElementById('search-btn').addEventListener('click', () => {
+    currentPage = 1;
+    loadUsers(currentPage, getSearchQuery());
+});
+
+function getSearchQuery() {
+    const firstName = document.getElementById('search-firstname').value.trim();
+    const lastName = document.getElementById('search-lastname').value.trim();
+    const batch = document.getElementById('search-batch').value.trim();
+
+    const queryParams = new URLSearchParams();
+
+    if (firstName) queryParams.append('firstname', firstName);
+    if (lastName) queryParams.append('lastname', lastName);
+    if (batch) queryParams.append('batch', batch);
+
+    return queryParams.toString();
+}
 
 
 document.addEventListener('DOMContentLoaded', () => {

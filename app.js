@@ -58,8 +58,8 @@ app.get('/api/check-auth', (req, res) => {
 
 
 app.use(API+API_V+AUTH_ENDPOINT, authRouter);
-app.use(API+API_V+PROT_ENDPOINT, authMW, protRouter);
 app.use(API+API_V, appRouter);
+app.use(API+API_V+PROT_ENDPOINT, authMW, protRouter);
 app.use(API+API_V+USERS_ENDPOINT, userRouter);
 
 
@@ -72,7 +72,7 @@ const start = async () => {
     try {
         console.log('connecting db');
         connectDB(process.env.MONGO_URI);
-        app.listen(port, () => {
+        app.listen(port, '0.0.0.0', () => {
             console.log(`Server listening on port ${port}`)
         } )
     }

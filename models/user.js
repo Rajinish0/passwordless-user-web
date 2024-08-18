@@ -8,17 +8,17 @@ const { BadRequestError } = require('../errors');
 const UserSchema = new mongoose.Schema({
     firstName : {
         type: String,
-        required: [true, "Please provide firstName"],
+        required: [true, "Please provide first name"],
         maxlength: 50,
         minlength: 3 
     },
 
-    // lastName : {
-    //     type: String,
-    //     required: [true, "Please provide lastName"],
-    //     maxlength: 50,
-    //     minlength: 3
-    // },
+    lastName : {
+        type: String,
+        // required: [true, "Please provide last name"],
+        maxlength: 50,
+        minlength: 3
+    },
 
     email: {
         type: String, 
@@ -27,7 +27,8 @@ const UserSchema = new mongoose.Schema({
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             'Please provide a valid email',
           ],
-        unique: [true, "This email already exists"]
+        unique: [true, "This email already exists"],
+        maxlength: 100
     },
 
     batch : {
@@ -35,15 +36,6 @@ const UserSchema = new mongoose.Schema({
         required: [true, "Please provide batch number"],
         min: 1960
     },
-
-    // phoneNum : {
-    //     type: String,
-    //     required: false, 
-    //     match: [
-    //         /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/,
-    //         "Please provide a valid number"
-    //     ]
-    // },
 
     imagePath : {
         type: String,
@@ -68,7 +60,27 @@ const UserSchema = new mongoose.Schema({
         required: false,
         match : [/^(?:\+92|92)?\s?(\d{3})[\s.-]?(\d{7})$|^(?:\+92|92)?\s?\((\d{3})\)[\s.-]?(\d{7})$/, 
                 "Please provide a valid phone number"]
-    }
+    },
+
+    facebook: {
+        type: String,
+        match: [/^(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?$/,
+                "Please provide a valid facebook url"
+        ],
+        required: false,
+        default: "",
+        maxlength: 100
+      },
+
+    instagram: {
+        type: String,
+        match: [/^(https?:\/\/)?(www\.)?(instagram\.com|instagr\.am)\/[A-Za-z0-9_.-]+\/?$/,
+                "Please provide a valid instagram link"
+        ],
+        required: false,
+        default: "",
+        maxlength: 100
+      }
 }, {
     timestamps: true
 });

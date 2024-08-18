@@ -43,8 +43,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '/verif-conf.html'; // Redirect to verif conf page
             } else {
                 // Registration failed
-                if (data.msg === 'validation error' && data.details) {
+                if (data.msg === 'Validation failed' && data.details) {
                     displayFieldErrors(data.details);
+                }else if (data.msg === 'File mimetype must be image' || 
+                          data.msg === 'Invalid image extension')
+                {
+                    const input = document.getElementById('photo');
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'field-error';
+                    errorElement.textContent = "Invalid image file";
+                    input.parentNode.insertBefore(errorElement, input.nextSibling);
                 } else {
                     errorMessage.textContent = data.message || 'Registration failed. Please try again.';
                     errorMessage.style.display = 'block';

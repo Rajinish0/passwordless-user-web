@@ -20,12 +20,16 @@ async function loadUserData() {
             <div class="user-card">
                 <div class="user-header">
                     <img src="${user.imagePath || 'default-profile.png'}" alt="${user.firstName}'s profile picture" class="user-image">
-                    <h2>${user.firstName}</h2>
+                    <h2>${user.firstName} ${user.lastName}</h2>
                 </div>
                 <div class="user-details">
                     <p><i class="fas fa-envelope"></i> ${user.email}</p>
                     <p><i class="fas fa-graduation-cap"></i> ${user.batch}</p>
-                    <p><i class="fas fa-info-circle"></i> Other info...</p>
+                    ${user.phoneNum ? `<p><i class='fas fa-phone'></i> ${user.phoneNum}</p>` : ''}
+                    <div class="social-links">
+                        ${user.facebook ? `<a href="${user.facebook}" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>` : ''}
+                        ${user.instagram ? `<a href="${user.instagram}" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>` : ''}
+                    </div>
                 </div>
             </div>
         `;

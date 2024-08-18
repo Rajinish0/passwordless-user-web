@@ -3,8 +3,11 @@ const jwt = require('jsonwebtoken');
 const { UnauthorizedError } = require('../errors');
 
 const auth = async (req, res, next) => {
-    if (!req.cookies || !req.cookies.token)
+    console.log('COOKIE AUTH WORKING');
+    if (!req.cookies || !req.cookies.token){
+        console.log('here!!');
         return next(new UnauthorizedError("Authentication failed"));
+    }
 
     const token = req.cookies.token;
     try {

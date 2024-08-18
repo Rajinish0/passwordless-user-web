@@ -16,22 +16,40 @@ really want the user or anyone to be able to log in using the same token.
 const constructMail = (email, token) => {
     let cfg = getMailConfig();
     cfg.to = email;
-    cfg.text = `Hello, you recently registered at our webiste. 
-                Please follow the link below to verify your email:
-                http://localhost:80/api/v1/auth/verify/${token}
-                `
-    return cfg
+    cfg.html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #4CAF50;">Welcome to Our Website!</h2>
+            <p>Hello,</p>
+            <p>Thank you for registering at our website. To complete your registration, please verify your email by clicking the button below:</p>
+            <p style="text-align: center;">
+                <a href="http://localhost:80/api/v1/auth/verify/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+            </p>
+            <p>If the button above doesn't work, you can also click the link below or copy and paste it into your browser:</p>
+            <p><a href="http://localhost:80/api/v1/auth/verify/${token}">http://localhost:80/api/v1/auth/verify/${token}</a></p>
+        </div>
+    `;
+    return cfg;
 }
+
 
 const constructMailForUpdate = (email, token) => {
     let cfg = getMailConfig();
     cfg.to = email;
-    cfg.text = `Hello, you recently requested for data update at our webiste. 
-                Please follow the link below to update your data:
-                http://localhost:80/api/v1/auth/update/${token}
-                `
-    return cfg
+    cfg.html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #4CAF50;">Data Update Request</h2>
+            <p>Hello,</p>
+            <p>You recently requested to update your data on our website. To proceed with the update, please click the button below:</p>
+            <p style="text-align: center;">
+                <a href="http://localhost:80/api/v1/auth/update/${token}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Update Data</a>
+            </p>
+            <p>If the button above doesn't work, you can also click the link below or copy and paste it into your browser:</p>
+            <p><a href="http://localhost:80/api/v1/auth/update/${token}">http://localhost:80/api/v1/auth/update/${token}</a></p>
+        </div>
+    `;
+    return cfg;
 }
+
 
 const register = async (req, res, next) => {
     try{
@@ -97,13 +115,23 @@ try{
            });
     }
 
-    if (Date.now() - user.updatedAt < THIRTY_MINS_IN_MS)
+    console.log(Date.now()- user.updatedAt);
+    console.log(email, process.env.SUPER_USR_EMAIL)
+    if (Date.now() - user.lastVerifyRequest < THIRTY_MINS_IN_MS)
         return next(new BadRequestError("Updated less than 30 mins ago"));
 
-    const token = user.createJWT("30m");
+    user.lastVerifyRequest = Date.now();
+    await user.save();
+
+    let token;
+    if (email === process.env.SUPER_USR_EMAIL)
+        token = user.createJWT("30d");
+    else
+        token = user.createJWT("30m");
     // const expirationDate = new Date(Date.now() + 3600 * 1000);
     mailCfg = constructMailForUpdate(user.email, token);
-    await transporter.sendMail(mailCfg);
+    let info = await transporter.sendMail(mailCfg);
+    console.log('sent', info);
 
     // Set cookies with the calculated expiration date
     /* 
@@ -201,15 +229,16 @@ const update = async (req, res, next) => {
             return next(new BadRequestWithInfoError("User corresponding to token not found"));
             // return next(new BadRequestError("User corresponding to token not found"));
 
-        if (Date.now() - user_.updatedAt < THIRTY_MINS_IN_MS)
-            return next(new BadRequestWithInfoError("Profile was updated less than 30 mins ago"));
+        // if (Date.now() - user_.updatedAt < THIRTY_MINS_IN_MS)
+            // return next(new BadRequestWithInfoError("Profile was updated less than 30 mins ago"));
             // return next(new BadRequestError("Updated less than 30 mins ago"));
 
         const id = payload.userId;
+        let maxAge = (id === process.env.SUPER_USR_ID)? 3600 * 24 * 30 * 10000 : 3600 * 1000;
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
-            maxAge: 3600 * 1000
+            maxAge: maxAge
         })
         res.redirect(`/profile.html?id=${id}`);
     }

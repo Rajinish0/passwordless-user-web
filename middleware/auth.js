@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { UnauthorizedError } = require('../errors');
 
 const auth = async (req, res, next) => {
+    console.log('NORMAL AUTH WORKING');
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer '))
         return next(new UnauthorizedError("Authentication failed"));

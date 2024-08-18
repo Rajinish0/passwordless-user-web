@@ -9,6 +9,23 @@ function getQueryParam(param) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+    function clearErrors() {
+        errDiv.style.display = 'none';
+        document.querySelectorAll('.field-error').forEach(el => el.remove());
+    }
+
+    function displayFieldErrors(errors) {
+        for (const [field, message] of Object.entries(errors)) {
+            const input = document.getElementById(field);
+            if (input) {
+                const errorElement = document.createElement('div');
+                errorElement.className = 'field-error';
+                errorElement.textContent = message;
+                input.parentNode.insertBefore(errorElement, input.nextSibling);
+            }
+        }
+    }
     const userId = getQueryParam('id');
     
     if (!userId) {
@@ -18,11 +35,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     try {
-        const response = await fetch(`/api/v1/user/${userId}`);
+        const response = await fetch(`/api/v1/prot/getuser/${userId}`);
         if (!response.ok) {
             throw new Error('Failed to fetch user data');
         }
         const { user } = await response.json();
+
+        console.log(user);
         
         // Display user profile form
         const profileContainer = document.getElementById('profile-container');
@@ -37,12 +56,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     
                 <div class="form-group">
                     <label for="firstName">First Name:</label>
-                    <input type="text" id="firstName" name="firstName" value="${user.firstName}" minlength=3>
+                    <input type="text" id="firstName" name="firstName" value="${user.firstName}" minlength=3 maxlength=50>
                 </div>
                 
                 <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" value="${user.lastName}" minlength=3 maxlength=50>
+                </div>
+
+                <div class="form-group">
                     <label for="batch">Batch:</label>
                     <input type="number" id="batch" name="batch" value="${user.batch}" min=1960>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNum">Phone Number: </label>
+                    <input type="string" id="phoneNum" name="phoneNum" value="${user.phoneNum}">
+                </div>
+
+                <div class="form-group">
+                    <label for="facebook">Facebook URL:</label>
+                    <input type="url" id="facebook" name="facebook" value="${user.facebook}">
+                </div>
+
+                <div class="form-group">
+                    <label for="instagram">Instagram URL:</label>
+                    <input type="url" id="instagram" name="instagram" value="${user.instagram}">
                 </div>
                 
                 <div class="form-group">
@@ -52,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 <div id="opts">
                     <button type="submit" id="submit-btn" class="submit-btn">Update Profile</button>
-                    <button type="submit" id="delete-btn" class="delete-btn">Delete Profile</button>
+                    <button id="delete-btn" class="delete-btn">Delete Profile</button>
                 </div>
 
                 <div id="f-error-message" class="error-message"></div>
@@ -68,6 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(submitButton);
         submitButton.addEventListener('click', async (event) => {
             event.preventDefault();
+            clearErrors();
 
             const formData = new FormData(profileForm);
             
@@ -79,12 +119,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Check if there were changes
             // const changes = {};
-            if (formData.get('firstName').trim() === user.firstName) 
-                formData.delete('firstName');
+            // if (formData.get('firstName').trim() === user.firstName) 
+                // formData.delete('firstName');
             // if (!formData.get('password').trim())
                 // formData.delete('password');
-            if (formData.get('batch').trim() === user.batch) 
-                formData.delete('batch');
+            // if (formData.get('batch').trim() === user.batch) 
+                // formData.delete('batch');
             
             // if (Object.keys(changes).length === 0) {
             //     return; // No changes to submit
@@ -99,14 +139,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log('here!!');
                 
                 if (!updateResponse.ok) {
-                    const errorData = await updateResponse.json();
+                    const data = await updateResponse.json();
                     if (updateResponse.status === 401) {
                         alert("You are unauthorized, please log in again");
                         window.location.href = 'update.html'; // Redirect if unauthorized
-                    } else if (errorData.details && errorData.details.password) {
-                        console.log("HERE");
-                        ferrDiv.textContent = errorData.details.password;
-                        ferrDiv.style.display = 'flex';
+                    } else if (data.msg === 'Validation failed' && data.details) {
+                        displayFieldErrors(data.details);
+                    } else if (data.msg === 'File mimetype must be image' || 
+                               data.msg === 'Invalid image extension'
+                    ){
+                        const input = document.getElementById('photo');
+                        const errorElement = document.createElement('div');
+                        errorElement.className = 'field-error';
+                        errorElement.textContent = "Invalid image file";
+                        input.parentNode.insertBefore(errorElement, input.nextSibling);
                     } else {
                         console.log("HERE NOW");
                         ferrDiv.textContent = 'Failed to update profile. Please try again later.';
@@ -163,6 +209,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         deleteButton.addEventListener('click', (e)=> {
             e.preventDefault();
             confDialog.style.display = 'flex'
+        })
+
+        confDialog.addEventListener('onblur', (e) => {
+            confDialog.style.display = 'none';
         })
 
         

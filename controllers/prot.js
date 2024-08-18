@@ -1,9 +1,11 @@
 const User = require('../models/user');
 const { StatusCodes } = require('http-status-codes');
-const { BadRequestError, UnauthorizedError, NotFoundError } = require('../errors/index');
+const { BadRequestError, UnauthorizedError, NotFoundError, BadRequestWithInfoError } = require('../errors/index');
 const { hashPass, processReqWithPhoto } = require('../utils');
 const fs = require('fs');
 const path = require('path');
+
+const THIRTY_MINS_IN_MS = 30 * 60 * 1000;
 
 const updateUser = async (req, res, next) => {
 try{
@@ -12,17 +14,16 @@ try{
         return next(new BadRequestError("Id required for this route"));
     if (id != req.user.userId)
         return next(new UnauthorizedError("Not authorized to update another user"))
-    const { firstName, password, batch } = req.body;
+    const { firstName, lastName, password, batch, phoneNum, facebook, instagram } = req.body;
 
     updateData = {}
-    if (firstName) updateData.firstName = firstName;
-    if (batch) updateData.batch = batch;
-    //the problem with password is that im saving the hashed value, so i have two choices
-    //either i change the pre save function and check for password length there
-    //or check the length here, im doing that here for now since im using findByIdAndUpdate
-    //but might change that later.
-    if (password && password.length < 8) return next(new BadRequestError("min password length: 8"));
-    if (password) updateData.password = await hashPass(password);
+    if (firstName) updateData.firstName = firstName.trim();
+    if (lastName) updateData.lastName = lastName.trim();
+    if (batch) updateData.batch = batch.trim();
+    if (phoneNum) updateData.phoneNum = phoneNum.trim();
+    if (facebook) updateData.facebook = facebook.trim();
+    if (instagram) updateData.instagram = instagram.trim();
+
     if (req.files){
         const finalPath = await processReqWithPhoto(req, id);
         updateData.imagePath = finalPath;
@@ -70,9 +71,7 @@ const deleteUser = async (req, res, next) => {
     if (!user_)
         return next( new NotFoundError(`No user with id ${id}`) );
 
-    if (user_.imagePath != 
-        path.join(path.dirname('..'), 'uploads', 'default-image.jpg')
-        )
+    if (path.basename(user_.imagePath) !== 'default-image.jpg')
         fs.unlink(user_.imagePath, (err)=>{
             if (err)
                 console.log(`ERROR DELETING ${id}'s photo: ${err}`)
@@ -82,7 +81,32 @@ const deleteUser = async (req, res, next) => {
        .send();
 }
 
+/*
+pofile.html uses this function, rn I'm allowing the user to update their profile for as long as their
+token is valid, if i want to restrict that just need to uncomment  the lines
+*/
+const getUserForUpdate = async (req, res, next) => {
+    const userId = req.user.userId;
+    const id = req.params.id;
+
+    if (userId != id)
+        return next (new UnauthorizedError("Not authorized"));
+
+    const user_ = await User.findOne({_id : id})
+                            .select('-lastVerifyRequest -updatedAt -createdAt');
+    if (!user_)
+        throw new NotFoundError(`No User with id ${id}`);
+
+    // if ((Date.now() - user_.updatedAt)< THIRTY_MINS_IN_MS)
+        // throw new BadRequestWithInfoError("Profile was updated less than 30 mins ago");
+
+    res.status(
+        StatusCodes.OK
+    ).json( {user:user_} );
+}
+
 module.exports = {
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserForUpdate
 }

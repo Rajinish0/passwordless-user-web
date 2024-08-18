@@ -77,3 +77,13 @@ body {
     text-align: center;
     display: none;
 }
+
+.field-error {
+    color: #721c24;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}

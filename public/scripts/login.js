@@ -5,6 +5,7 @@ function showMessage(msg){
     errElem.classList.remove('hidden-elem');
 }
 
+
 document.getElementById('login-form').addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -34,7 +35,7 @@ document.getElementById('login-form').addEventListener('submit', async function 
             }
 
             if (data.msg === 'Updated less than 30 mins ago'){
-                showMessage("Your profile was updated less than 30 mins ago, please wait.");
+                showMessage("Your requested a link less than 30 mins ago, please wait.");
                 // const errElem = document.getElementById('error-message');
                 // errElem.textContent = "Your profile was updated less than 30 mins ago, please wait.";
                 // errElem.classList.remove('hidden-elem');
